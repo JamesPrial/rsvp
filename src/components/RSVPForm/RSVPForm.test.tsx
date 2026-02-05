@@ -6,10 +6,10 @@ import * as firebase from '../../services/firebase'
 // Mock Firebase service
 vi.mock('../../services/firebase', () => ({
   submitRSVP: vi.fn(),
-  DuplicateEmailError: class DuplicateEmailError extends Error {
+  DuplicateRSVPError: class DuplicateRSVPError extends Error {
     constructor() {
-      super('An RSVP has already been submitted with this email address')
-      this.name = 'DuplicateEmailError'
+      super('An RSVP has already been submitted with this email or name')
+      this.name = 'DuplicateRSVPError'
     }
   },
 }))
@@ -114,10 +114,10 @@ describe('RSVPForm', () => {
     })
   })
 
-  it('shows user-friendly error for duplicate email submission', async () => {
+  it('shows user-friendly error for duplicate RSVP submission', async () => {
     const user = userEvent.setup()
-    const { DuplicateEmailError } = await import('../../services/firebase')
-    vi.mocked(firebase.submitRSVP).mockRejectedValue(new DuplicateEmailError())
+    const { DuplicateRSVPError } = await import('../../services/firebase')
+    vi.mocked(firebase.submitRSVP).mockRejectedValue(new DuplicateRSVPError())
 
     render(<RSVPForm />)
 
@@ -128,7 +128,7 @@ describe('RSVPForm', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText(/this email address has already been used/i)
+        screen.getByText(/this email or name has already been used/i)
       ).toBeInTheDocument()
     })
   })

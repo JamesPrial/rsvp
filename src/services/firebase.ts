@@ -24,15 +24,19 @@ export function initializeFirebase(): Firestore | null {
   return db
 }
 
-export class DuplicateEmailError extends Error {
+export class DuplicateRSVPError extends Error {
   constructor() {
-    super('An RSVP has already been submitted with this email address')
-    this.name = 'DuplicateEmailError'
+    super('An RSVP has already been submitted with this email or name')
+    this.name = 'DuplicateRSVPError'
   }
 }
 
 function normalizeEmailForDocId(email: string): string {
   return email.trim().toLowerCase()
+}
+
+function normalizeNameForDocId(name: string): string {
+  return name.trim().toLowerCase().replace(/\s+/g, ' ')
 }
 
 export interface RSVPSubmission {
@@ -54,21 +58,34 @@ export async function submitRSVP(
   }
 
   const normalizedEmail = normalizeEmailForDocId(data.email)
-  const docRef = doc(firestore, 'rsvps', normalizedEmail)
+  const normalizedName = normalizeNameForDocId(data.name)
+  const rsvpDocRef = doc(firestore, 'rsvps', normalizedEmail)
+  const nameDocRef = doc(firestore, 'rsvp-names', normalizedName)
 
-  await runTransaction(firestore, async (transaction) => {
-    const docSnapshot = await transaction.get(docRef)
+  try {
+    await runTransaction(firestore, async (transaction) => {
+      transaction.set(rsvpDocRef, {
+        ...data,
+        email: normalizedEmail,
+        submittedAt: Timestamp.now(),
+      })
 
-    if (docSnapshot.exists()) {
-      throw new DuplicateEmailError()
-    }
-
-    transaction.set(docRef, {
-      ...data,
-      email: normalizedEmail,
-      submittedAt: Timestamp.now(),
+      transaction.set(nameDocRef, {
+        email: normalizedEmail,
+        name: data.name,
+        createdAt: Timestamp.now(),
+      })
     })
-  })
+  } catch (error: unknown) {
+    if (
+      error instanceof Error &&
+      'code' in error &&
+      (error as { code: string }).code === 'permission-denied'
+    ) {
+      throw new DuplicateRSVPError()
+    }
+    throw error
+  }
 
   return normalizedEmail
 }

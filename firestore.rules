@@ -6,5 +6,9 @@ service cloud.firestore {
       allow create: if request.resource.data.email == rsvpId;
       allow read, update, delete: if false;
     }
+    match /rsvp-names/{nameId} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
   }
 }

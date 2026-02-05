@@ -50,3 +50,4 @@ npm run build && firebase deploy --only hosting
 - Vite + React + TypeScript
 - CSS Modules with theme support
 - Firebase Firestore + Hosting
+- Email and name uniqueness enforced via Firestore security rules

@@ -55,6 +55,10 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /rsvps/{rsvpId} {
+      allow create: if request.resource.data.email == rsvpId;
+      allow read, update, delete: if false;
+    }
+    match /rsvp-names/{nameId} {
       allow create: if true;
       allow read, update, delete: if false;
     }
@@ -79,7 +83,7 @@ src/
 ├── types/
 │   └── rsvp.ts                   # RSVP form type definitions
 ├── services/
-│   └── firebase.ts               # Firebase init + submitRSVP()
+│   └── firebase.ts               # Firebase init + submitRSVP() + uniqueness enforcement
 ├── context/                      # ThemeContext + useTheme hook
 └── components/
     └── RSVPForm/
@@ -92,10 +96,18 @@ src/
         └── useRSVPForm.ts        # Form state + validation hook
 ```
 
+## Uniqueness Enforcement
+
+Email and name uniqueness is enforced via Firestore's create-only security rules:
+- `rsvps` collection: doc ID = normalized email
+- `rsvp-names` collection: doc ID = normalized name (lowercase, trimmed, collapsed whitespace)
+- Both docs are written atomically in a single transaction
+- If either already exists, the create-only rule rejects the write as `permission-denied`, surfaced to the user as a `DuplicateRSVPError`
+
 ## RSVP Form Fields
 
-- Name (required)
-- Email (required)
+- Name (required, unique)
+- Email (required, unique)
 - Attending (required, yes/no)
 - Number of guests (conditional, shown if attending)
 - Expected arrival time (conditional, required if attending, dropdown with 1-hour windows)
