@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-RSVP/evite webpage hosted on GitHub Pages. Built with Vite + React + TypeScript + CSS Modules. Uses Firebase Firestore for storing RSVP submissions.
+RSVP/evite webpage hosted on Firebase Hosting. Built with Vite + React + TypeScript + CSS Modules. Uses Firebase Firestore for storing RSVP submissions.
 
 ## Commands
 
@@ -39,18 +39,8 @@ darkModeDefault: false
 
 Firebase credentials are stored in environment variables for security.
 
-**Local Development:**
 1. Copy `.env.example` to `.env.local`
-2. Fill in your Firebase credentials
-
-**CI/CD (GitHub Actions):**
-Add these secrets in repository settings (Settings → Secrets and variables → Actions):
-- `VITE_FIREBASE_API_KEY`
-- `VITE_FIREBASE_AUTH_DOMAIN`
-- `VITE_FIREBASE_PROJECT_ID`
-- `VITE_FIREBASE_STORAGE_BUCKET`
-- `VITE_FIREBASE_MESSAGING_SENDER_ID`
-- `VITE_FIREBASE_APP_ID`
+2. Fill in your Firebase credentials from the Firebase Console
 
 ## Firebase Setup
 
@@ -124,13 +114,15 @@ src/
 ## Build System
 
 - Config injected at build time via `__EVENT_CONFIG__` global (see `vite.config.ts`)
-- Base path set to `/rsvp/` for GitHub Pages - update if repo name changes
+- Base path defaults to `/` for Firebase Hosting (configurable via `VITE_BASE_PATH`)
 
 ## Deployment
 
-Push to `main` triggers GitHub Actions → builds → deploys to GitHub Pages.
+Deploy to Firebase Hosting:
 
-**Setup:** Settings → Pages → Source: GitHub Actions
+```bash
+npm run build && firebase deploy --only hosting
+```
 
 ## Known Warnings
 
