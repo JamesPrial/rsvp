@@ -1,0 +1,21 @@
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg);
+  transition: background-color var(--transition-normal);
+}
+
+.main {
+  flex: 1;
+  width: 100%;
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-md);
+}
+
+@media (min-width: 640px) {
+  .main {
+    padding: var(--spacing-2xl) var(--spacing-xl);
+  }
+}

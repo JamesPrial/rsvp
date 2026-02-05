@@ -1,0 +1,21 @@
+# Event Configuration
+# See config.yaml.example for documentation
+
+event:
+  title: "The Pain Bonanza"
+  date: "2026-02-05T12:00:00"
+  location: "123 Main Street, City, State"
+  description: |
+    Join us for a wonderful celebration!
+
+    We look forward to seeing you there.
+
+# Theme: elegant | festive | modern | garden
+theme: "elegant"
+
+# Start in dark mode
+darkModeDefault: true
+
+# Note: Firebase configuration is stored in environment variables.
+# For local development: Copy .env.example to .env.local
+# For CI/CD: Configure GitHub Secrets (see .github/workflows/deploy.yml)

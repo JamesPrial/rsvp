@@ -1,0 +1,21 @@
+# Event Configuration
+# Copy this file to config.yaml and customize for your event
+
+event:
+  title: "Your Event Name"
+  date: "2026-03-15T18:00:00"  # ISO format
+  location: "123 Main Street, City, State"
+  description: |
+    Join us for a wonderful celebration!
+
+    We look forward to seeing you there.
+
+# Theme: elegant | festive | modern | garden
+theme: "elegant"
+
+# Start in dark mode
+darkModeDefault: false
+
+# Note: Firebase configuration is stored in environment variables.
+# For local development: Copy .env.example to .env.local
+# For CI/CD: Configure GitHub Secrets (see .github/workflows/deploy.yml)
