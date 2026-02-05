@@ -36,6 +36,9 @@ function validateForm(data: RSVPFormData): RSVPFormErrors {
     if (data.guestCount < 1 || data.guestCount > 10) {
       errors.guestCount = 'Number of guests must be between 1 and 10'
     }
+    if (!data.arrivalTime) {
+      errors.arrivalTime = 'Please select an arrival time'
+    }
   }
 
   return errors
@@ -81,7 +84,7 @@ export function useRSVPForm() {
           attending: data.attending === 'yes',
           ...(data.attending === 'yes' && {
             guestCount: data.guestCount,
-            arrivalTime: data.arrivalTime || undefined,
+            arrivalTime: data.arrivalTime,
           }),
           ...(data.message.trim() && { message: data.message.trim() }),
         })

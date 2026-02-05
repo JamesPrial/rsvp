@@ -150,16 +150,50 @@ export function RSVPForm() {
               />
             </FormField>
 
-            <FormField label="Expected arrival time" htmlFor="arrivalTime">
-              <input
-                type="time"
+            <FormField
+              label="Expected arrival time"
+              htmlFor="arrivalTime"
+              error={errors.arrivalTime}
+              required
+            >
+              <select
                 id="arrivalTime"
                 name="arrivalTime"
                 value={data.arrivalTime}
                 onChange={(e) => updateField('arrivalTime', e.target.value)}
                 className={styles.input}
+                aria-invalid={!!errors.arrivalTime}
+                aria-describedby={
+                  errors.arrivalTime ? 'arrivalTime-error' : undefined
+                }
                 disabled={isSubmitting}
-              />
+              >
+                <option value="">Select arrival time</option>
+                <option value="00:00-01:00">12:00 AM - 1:00 AM</option>
+                <option value="01:00-02:00">1:00 AM - 2:00 AM</option>
+                <option value="02:00-03:00">2:00 AM - 3:00 AM</option>
+                <option value="03:00-04:00">3:00 AM - 4:00 AM</option>
+                <option value="04:00-05:00">4:00 AM - 5:00 AM</option>
+                <option value="05:00-06:00">5:00 AM - 6:00 AM</option>
+                <option value="06:00-07:00">6:00 AM - 7:00 AM</option>
+                <option value="07:00-08:00">7:00 AM - 8:00 AM</option>
+                <option value="08:00-09:00">8:00 AM - 9:00 AM</option>
+                <option value="09:00-10:00">9:00 AM - 10:00 AM</option>
+                <option value="10:00-11:00">10:00 AM - 11:00 AM</option>
+                <option value="11:00-12:00">11:00 AM - 12:00 PM</option>
+                <option value="12:00-13:00">12:00 PM - 1:00 PM</option>
+                <option value="13:00-14:00">1:00 PM - 2:00 PM</option>
+                <option value="14:00-15:00">2:00 PM - 3:00 PM</option>
+                <option value="15:00-16:00">3:00 PM - 4:00 PM</option>
+                <option value="16:00-17:00">4:00 PM - 5:00 PM</option>
+                <option value="17:00-18:00">5:00 PM - 6:00 PM</option>
+                <option value="18:00-19:00">6:00 PM - 7:00 PM</option>
+                <option value="19:00-20:00">7:00 PM - 8:00 PM</option>
+                <option value="20:00-21:00">8:00 PM - 9:00 PM</option>
+                <option value="21:00-22:00">9:00 PM - 10:00 PM</option>
+                <option value="22:00-23:00">10:00 PM - 11:00 PM</option>
+                <option value="23:00-00:00">11:00 PM - 12:00 AM</option>
+              </select>
             </FormField>
           </>
         )}

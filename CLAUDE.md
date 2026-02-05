@@ -48,19 +48,21 @@ Firebase credentials are stored in environment variables for security.
 2. Create a new project (or select existing)
 3. Click "Add app" → Web (`</>`) → Copy the config values to `.env.local`
 4. Go to Firestore Database → Create database
-5. Set security rules:
+5. Set security rules (in `firestore.rules`):
 
 ```javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /rsvps/{rsvpId} {
-      allow create: if request.resource.data.keys().hasAll(['name', 'email', 'attending', 'submittedAt']);
+      allow create: if true;
       allow read, update, delete: if false;
     }
   }
 }
 ```
+
+6. Deploy rules: `firebase deploy --only firestore:rules`
 
 ## Architecture
 
@@ -68,6 +70,7 @@ service cloud.firestore {
 config.yaml                       # Event config (title, date, theme)
 .env.local                        # Firebase config (local dev, gitignored)
 .env.example                      # Environment variable template
+firestore.rules                   # Firestore security rules
 vite.config.ts                    # Merges YAML + env vars into __EVENT_CONFIG__
 src/
 ├── config.ts                     # Reads __EVENT_CONFIG__ from build
@@ -95,7 +98,7 @@ src/
 - Email (required)
 - Attending (required, yes/no)
 - Number of guests (conditional, shown if attending)
-- Expected arrival time (conditional, time picker)
+- Expected arrival time (conditional, required if attending, dropdown with 1-hour windows)
 - Message/notes (optional)
 
 ## Styling
