@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { RSVPFormData, RSVPFormErrors, SubmitStatus } from '../../types/rsvp'
-import { submitRSVP } from '../../services/firebase'
+import { submitRSVP, DuplicateEmailError } from '../../services/firebase'
 
 const initialFormData: RSVPFormData = {
   name: '',
@@ -93,11 +93,17 @@ export function useRSVPForm() {
         setData(initialFormData)
       } catch (error) {
         setSubmitStatus('error')
-        setSubmitError(
-          error instanceof Error
-            ? error.message
-            : 'An error occurred while submitting your RSVP'
-        )
+        if (error instanceof DuplicateEmailError) {
+          setSubmitError(
+            'This email address has already been used to RSVP. If you need to update your response, please contact the host.'
+          )
+        } else {
+          setSubmitError(
+            error instanceof Error
+              ? error.message
+              : 'An error occurred while submitting your RSVP'
+          )
+        }
       } finally {
         setIsSubmitting(false)
       }

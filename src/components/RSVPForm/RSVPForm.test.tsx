@@ -6,6 +6,12 @@ import * as firebase from '../../services/firebase'
 // Mock Firebase service
 vi.mock('../../services/firebase', () => ({
   submitRSVP: vi.fn(),
+  DuplicateEmailError: class DuplicateEmailError extends Error {
+    constructor() {
+      super('An RSVP has already been submitted with this email address')
+      this.name = 'DuplicateEmailError'
+    }
+  },
 }))
 
 describe('RSVPForm', () => {
@@ -73,6 +79,10 @@ describe('RSVPForm', () => {
     await user.type(screen.getByLabelText(/name/i), 'John Doe')
     await user.type(screen.getByLabelText(/email/i), 'john@example.com')
     await user.click(screen.getByLabelText(/yes, i'll be there/i))
+    await user.selectOptions(
+      screen.getByLabelText(/expected arrival time/i),
+      '18:00-19:00'
+    )
     await user.click(screen.getByRole('button', { name: /submit/i }))
 
     await waitFor(() => {
@@ -84,6 +94,7 @@ describe('RSVPForm', () => {
       email: 'john@example.com',
       attending: true,
       guestCount: 1,
+      arrivalTime: '18:00-19:00',
     })
   })
 
@@ -100,6 +111,25 @@ describe('RSVPForm', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/network error/i)).toBeInTheDocument()
+    })
+  })
+
+  it('shows user-friendly error for duplicate email submission', async () => {
+    const user = userEvent.setup()
+    const { DuplicateEmailError } = await import('../../services/firebase')
+    vi.mocked(firebase.submitRSVP).mockRejectedValue(new DuplicateEmailError())
+
+    render(<RSVPForm />)
+
+    await user.type(screen.getByLabelText(/name/i), 'John Doe')
+    await user.type(screen.getByLabelText(/email/i), 'john@example.com')
+    await user.click(screen.getByLabelText(/sorry, i can't make it/i))
+    await user.click(screen.getByRole('button', { name: /submit/i }))
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/this email address has already been used/i)
+      ).toBeInTheDocument()
     })
   })
 

@@ -2,8 +2,8 @@ import { initializeApp, FirebaseApp } from 'firebase/app'
 import {
   getFirestore,
   Firestore,
-  collection,
-  addDoc,
+  doc,
+  runTransaction,
   Timestamp,
 } from 'firebase/firestore'
 import { firebaseConfig } from '../config'
@@ -24,6 +24,17 @@ export function initializeFirebase(): Firestore | null {
   return db
 }
 
+export class DuplicateEmailError extends Error {
+  constructor() {
+    super('An RSVP has already been submitted with this email address')
+    this.name = 'DuplicateEmailError'
+  }
+}
+
+function normalizeEmailForDocId(email: string): string {
+  return email.trim().toLowerCase()
+}
+
 export interface RSVPSubmission {
   name: string
   email: string
@@ -42,10 +53,22 @@ export async function submitRSVP(
     throw new Error('Firebase is not configured')
   }
 
-  const docRef = await addDoc(collection(firestore, 'rsvps'), {
-    ...data,
-    submittedAt: Timestamp.now(),
+  const normalizedEmail = normalizeEmailForDocId(data.email)
+  const docRef = doc(firestore, 'rsvps', normalizedEmail)
+
+  await runTransaction(firestore, async (transaction) => {
+    const docSnapshot = await transaction.get(docRef)
+
+    if (docSnapshot.exists()) {
+      throw new DuplicateEmailError()
+    }
+
+    transaction.set(docRef, {
+      ...data,
+      email: normalizedEmail,
+      submittedAt: Timestamp.now(),
+    })
   })
 
-  return docRef.id
+  return normalizedEmail
 }
