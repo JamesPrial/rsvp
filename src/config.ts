@@ -10,8 +10,10 @@ declare const __EVENT_CONFIG__: {
     title: string
     date: string
     location: string
+    hostEmail: string
     description: string
   }
+  appBaseUrl: string
   firebase: {
     apiKey: string
     authDomain: string
@@ -33,6 +35,7 @@ export const eventConfig = {
   description: config.event.description.trim(),
   theme: config.theme as 'elegant' | 'festive' | 'modern' | 'garden',
   darkModeDefault: config.darkModeDefault,
+  appBaseUrl: config.appBaseUrl,
 }
 
 export const firebaseConfig = config.firebase

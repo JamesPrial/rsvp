@@ -6,6 +6,7 @@ import {
   runTransaction,
   Timestamp,
 } from 'firebase/firestore'
+import { getFunctions, httpsCallable } from 'firebase/functions'
 import { firebaseConfig } from '../config'
 
 let app: FirebaseApp | null = null
@@ -39,6 +40,12 @@ function normalizeNameForDocId(name: string): string {
   return name.trim().toLowerCase().replace(/\s+/g, ' ')
 }
 
+export function generateVerificationToken(): string {
+  const bytes = new Uint8Array(32)
+  crypto.getRandomValues(bytes)
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
+}
+
 export interface RSVPSubmission {
   name: string
   email: string
@@ -47,10 +54,14 @@ export interface RSVPSubmission {
   arrivalTime?: string
   message?: string
   submittedAt: Timestamp
+  status: 'pending' | 'verified'
+  verificationToken: string
+  verificationTokenExpiry: Timestamp
+  verifiedAt?: Timestamp
 }
 
 export async function submitRSVP(
-  data: Omit<RSVPSubmission, 'submittedAt'>
+  data: Omit<RSVPSubmission, 'submittedAt' | 'status' | 'verificationToken' | 'verificationTokenExpiry' | 'verifiedAt'>
 ): Promise<string> {
   const firestore = initializeFirebase()
   if (!firestore) {
@@ -62,12 +73,19 @@ export async function submitRSVP(
   const rsvpDocRef = doc(firestore, 'rsvps', normalizedEmail)
   const nameDocRef = doc(firestore, 'rsvp-names', normalizedName)
 
+  const verificationToken = generateVerificationToken()
+  const now = Timestamp.now()
+  const expiry = Timestamp.fromMillis(now.toMillis() + 24 * 60 * 60 * 1000)
+
   try {
     await runTransaction(firestore, async (transaction) => {
       transaction.set(rsvpDocRef, {
         ...data,
         email: normalizedEmail,
         submittedAt: Timestamp.now(),
+        status: 'pending',
+        verificationToken,
+        verificationTokenExpiry: expiry,
       })
 
       transaction.set(nameDocRef, {
@@ -88,4 +106,23 @@ export async function submitRSVP(
   }
 
   return normalizedEmail
+}
+
+export async function verifyEmailToken(
+  token: string
+): Promise<{ success: boolean }> {
+  if (!app) {
+    initializeFirebase()
+  }
+  if (!app) {
+    throw new Error('Firebase is not configured')
+  }
+
+  const functions = getFunctions(app)
+  const verify = httpsCallable<{ token: string }, { success: boolean }>(
+    functions,
+    'verifyEmail'
+  )
+  const result = await verify({ token })
+  return result.data
 }

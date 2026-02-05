@@ -36,6 +36,7 @@ export default defineConfig(({ mode }) => {
   // Merge YAML config with Firebase credentials from env vars
   const config = {
     ...yamlConfig,
+    appBaseUrl: env.VITE_APP_BASE_URL || '',
     firebase: {
       apiKey: env.VITE_FIREBASE_API_KEY || '',
       authDomain: env.VITE_FIREBASE_AUTH_DOMAIN || '',

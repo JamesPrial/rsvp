@@ -6,6 +6,8 @@ import * as firebase from '../../services/firebase'
 // Mock Firebase service
 vi.mock('../../services/firebase', () => ({
   submitRSVP: vi.fn(),
+  generateVerificationToken: vi.fn(() => 'a'.repeat(64)),
+  verifyEmailToken: vi.fn(),
   DuplicateRSVPError: class DuplicateRSVPError extends Error {
     constructor() {
       super('An RSVP has already been submitted with this email or name')
@@ -86,7 +88,7 @@ describe('RSVPForm', () => {
     await user.click(screen.getByRole('button', { name: /submit/i }))
 
     await waitFor(() => {
-      expect(screen.getByText(/thank you for your rsvp/i)).toBeInTheDocument()
+      expect(screen.getByText(/check your email/i)).toBeInTheDocument()
     })
 
     expect(firebase.submitRSVP).toHaveBeenCalledWith({
@@ -170,7 +172,7 @@ describe('RSVPForm', () => {
     resolveSubmit!('doc-123')
 
     await waitFor(() => {
-      expect(screen.getByText(/thank you/i)).toBeInTheDocument()
+      expect(screen.getByText(/check your email/i)).toBeInTheDocument()
     })
   })
 
@@ -186,7 +188,7 @@ describe('RSVPForm', () => {
     await user.click(screen.getByRole('button', { name: /submit/i }))
 
     await waitFor(() => {
-      expect(screen.getByText(/thank you/i)).toBeInTheDocument()
+      expect(screen.getByText(/check your email/i)).toBeInTheDocument()
     })
 
     await user.click(screen.getByText(/submit another response/i))

@@ -6,8 +6,10 @@ import '@testing-library/jest-dom'
     title: 'Test Event',
     date: '2026-03-15T18:00:00',
     location: '123 Test St',
+    hostEmail: 'host@example.com',
     description: 'Test description',
   },
+  appBaseUrl: 'http://localhost:5173',
   firebase: {
     apiKey: 'test-api-key',
     authDomain: 'test.firebaseapp.com',

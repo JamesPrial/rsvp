@@ -1,0 +1,10 @@
+lib/
+node_modules/
+
+# Local env / secrets
+.env
+.env.*
+.secret.local
+
+# Firebase local config
+.runtimeconfig.json

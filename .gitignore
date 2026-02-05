@@ -33,3 +33,7 @@ Thumbs.db
 
 # Firebase
 .firebase
+.runtimeconfig.json
+
+# Functions build output
+functions/lib

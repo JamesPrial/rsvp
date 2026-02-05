@@ -29,9 +29,13 @@ export function RSVPForm() {
               d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
             />
           </svg>
-          <h3 className={styles.successTitle}>Thank you for your RSVP!</h3>
+          <h3 className={styles.successTitle}>Check your email!</h3>
           <p className={styles.successText}>
-            We've received your response and look forward to seeing you!
+            We've sent a verification link to your email address. Please click
+            it to confirm your RSVP. The link expires in 24 hours.
+          </p>
+          <p className={styles.successText}>
+            Don't see it? Check your spam folder.
           </p>
           <button type="button" onClick={resetForm} className={styles.button}>
             Submit another response

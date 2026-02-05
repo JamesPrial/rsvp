@@ -2,13 +2,21 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /rsvps/{rsvpId} {
-      // Only allow create if document ID matches the email field
-      allow create: if request.resource.data.email == rsvpId;
+      // Only allow create if document ID matches the email field and status is pending
+      allow create: if
+        request.resource.data.email == rsvpId &&
+        request.resource.data.status == 'pending';
       allow read, update, delete: if false;
     }
     match /rsvp-names/{nameId} {
       allow create: if true;
       allow read, update, delete: if false;
+    }
+    match /mail/{mailId} {
+      allow read, write: if false;
+    }
+    match /config/{docId} {
+      allow read, write: if false;
     }
   }
 }
